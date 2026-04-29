@@ -382,15 +382,12 @@
 const CATS = [
   { id: 'structural', label: 'Structural & Foundation', items: [
     'Replace rotted bearer sections — southern wall (urgent, active water damage)',
-    'Whole-of-house bearer replacement and masonry pier repair/replacement (note: masonry construction, not timber piers)',
+    'Whole-of-house bearer replacement and masonry pier repair/replacement (masonry construction throughout — no timber piers)',
     'Fit ant caps to masonry piers currently lacking termite protection',
-    'Clear subfloor vegetation from around piers (obscuring inspection)',
-    'Remove stored items from subfloor area and reinspect concealed areas',
     'Provide alternative access point to rear subfloor area (crawl space currently too low to inspect)',
     'General subfloor remediation — repair perimeter bearer timbers with confirmed water damage',
   ]},
   { id: 'roof', label: 'Roof', items: [
-    'Clean gutters — blocked with leaf matter throughout (maintenance)',
     'Replace damaged roofing iron — like-for-like Colorbond (maintenance)',
     'Replace Colorbond with heritage-appropriate corrugated iron (material change)',
     'Repair or replace roof flashings (weathered, deterioration evident)',
@@ -410,28 +407,28 @@ const CATS = [
     'Licensed asbestos removal — carport wall sheeting (inspector confirmed probable ACM)',
   ]},
   { id: 'verandah', label: 'Front Verandah & Deck', items: [
-    'Structural engineer assessment of front verandah deck load capacity (inspector was unable to verify)',
+    'Structural engineer assessment of front verandah deck load capacity (inspector unable to verify at time of inspection)',
     'Replace fungal decay-affected verandah decking boards',
-    'Repair or replace structural deck support timbers (fungal decay confirmed by inspection)',
+    'Repair or replace structural deck support timbers (fungal decay confirmed)',
     'Remove creeper vine from southern end of front verandah',
-    'Repair or replace timber window frames and sashes to verandah-facing rooms',
+    'BCA-compliant balustrade — front verandah fall height is approximately 1.8m (BCA threshold 1m); proposed approach: (a) build up ground level to reduce fall below 1m threshold, or (b) heritage exemption for reinstated original ironwork balustrade — BSC guidance required on preferred pathway',
   ]},
   { id: 'windows', label: 'Windows & Doors', items: [
-    'Replace failed windows — like-for-like (same size, single-glazed timber sash)',
-    'Replace windows with new double-glazed timber sash units',
+    'Replace windows throughout — dimensionally consistent double-hung sash windows with double glazing (all rooms except front two)',
+    'Reinstate bay windows to front two rooms — double-hung sash with double glazing (original configuration, primary heritage elevation)',
     'Install bullnose window awnings — all elevations (period-appropriate Federation detail, reinstatement)',
     'Replace external doors',
-    'Replace cracked glass panes to front entry door (stained glass panels — heritage)',
+    'Replace cracked glass panes to front entry door (stained glass panels — heritage significance)',
   ]},
   { id: 'demolition', label: 'Rear Extension Demolition', items: [
-    'Demolish rear extension (bathroom, laundry, covered patio)',
+    'Demolish rear extension (bathroom, laundry, covered patio) — includes removal of rusted water tank within demolition footprint',
     'Demolish carport (extremely poor condition — fungal decay and deterioration throughout)',
     'Demolish small storage shed at rear (poor condition)',
     'Reinstate rear wall of original house post-demolition',
   ]},
   { id: 'internal', label: 'Internal Works — Stage 1 Interim', items: [
     'Convert existing bedroom (2.3 x 4m) to family bathroom — wet area fitout within existing room footprint (no structural wall removal required)',
-    'Install temporary galley kitchen (interim, pending extension DA)',
+    'Install temporary galley kitchen (interim fitout — will be converted to ensuite under Stage 2 DA)',
     'Install Velux solar-powered skylight — family bathroom (Stage 1)',
     'Install Velux solar-powered skylight — ensuite bathroom (Stage 2, with extension DA)',
   ]},
@@ -440,34 +437,25 @@ const CATS = [
     'Install subfloor insulation between floor joists — reflective foil or rigid batts (installed during subfloor remediation works)',
     'Install vapour-permeable wall insulation — mineral wool batts with ventilated cavity maintained behind new cladding (installed during cladding replacement works, not a standalone intervention)',
   ]},
-  { id: 'pest', label: 'Timber Pest Management', items: [
-    'Engage licensed timber pest specialist — full inspection of all areas including roof void and subfloor',
-    'Implement AS3660-compliant Termite Management Plan',
-    'Install chemical and/or physical termite barrier system to building perimeter',
-    'Remove all timbers in contact with ground around building perimeter',
-  ]},
   { id: 'site', label: 'Site Works & Drainage', items: [
     'Install drainage to rear yard — water currently ponding against rear wall of house',
     'Remove large gum tree (structural safety risk to dwelling)',
-    'Clear overgrown vegetation from all sides of building perimeter (termite inspection zone)',
-    'Clear rear and side yard vegetation (currently obscuring inspection)',
     'Install swale for stormwater management',
     'Stormwater connection and associated works',
-    'Replace rusted water tank',
   ]},
   { id: 'frontage', label: 'Frontage & Fencing', items: [
     'Reinstate front picket fence',
     'Replace deteriorated timber fence to rear lane (significant fungal decay)',
-    'Build up ground level at front to reduce verandah fall height below 1m threshold',
+    'Build up ground level at front to reduce verandah fall height below 1m BCA threshold (one of two options for balustrade compliance — see Verandah category)',
     'Front landscaping with sympathetic stone materials',
   ]},
   { id: 'heritage', label: 'Heritage Reinstatement', items: [
-    'Reinstate original Federation ironwork balustrade (pattern to be confirmed by specialist)',
-    'Reinstate bay windows to front elevation (two front rooms)',
+    'Reinstate original Federation ironwork balustrade — wrought iron, continuous scrolling pattern (pattern to be confirmed by specialist metalwork assessment prior to DA lodgement)',
+    'Reinstate original front entry stairs (heritage reinstatement — configuration to be confirmed from historical evidence)',
+    'Heritage exemption for non-BCA-compliant balustrade height — if ground build-up approach not taken, formal heritage exemption argument to be made in DA',
   ]},
   { id: 'structures', label: 'New Structures', items: [
-    'Construct new carport with gym/workshop space at rear (off rear lane)',
-    'Construct new general storage shed',
+    'Construct new carport/storage and workshop building at rear (off rear lane) — vehicle shelter, household storage (general items, seasonal), garden equipment storage, workbench and workshop activities (tools, electronics)',
   ]},
 ];
 
@@ -505,9 +493,10 @@ function renderBackground() {
         <div class="bg-kv"><div class="bg-kv-label">Building Style</div><div class="bg-kv-val">Federation-era double-gable Queenslander, circa 1907</div></div>
         <div class="bg-kv"><div class="bg-kv-label">Original Owner</div><div class="bg-kv-val">Frederick Bertie Harrigan (carpenter) — Crown Grant 12 January 1907</div></div>
         <div class="bg-kv"><div class="bg-kv-label">Current Owners</div><div class="bg-kv-val">Stuart Smith &amp; Amy Brooks</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Settlement Date</div><div class="bg-kv-val">8 May 2026 (not yet settled at date of this document)</div></div>
         <div class="bg-kv"><div class="bg-kv-label">Zoning</div><div class="bg-kv-val">R1 General Residential</div></div>
       </div>
-      <p>The property is a five-bedroom timber-framed and weatherboard-clad single-storey residence on a full original allotment. The building retains its Federation-era double-gable form and front verandah. It was purchased by Stuart Smith and Amy Brooks in early 2026, who intend to permanently relocate to Dorrigo and undertake a heritage-sensitive renovation and extension.</p>
+      <p>The property is a five-bedroom timber-framed and weatherboard-clad single-storey residence on a full original allotment. The building retains its Federation-era double-gable form and front verandah. Stuart Smith and Amy Brooks are purchasing the property with the intention of permanently relocating to Dorrigo and undertaking a heritage-sensitive renovation and extension.</p>
     </div>
 
     <div class="bg-section">
@@ -524,7 +513,7 @@ function renderBackground() {
 
       <div class="stage-row">
         <div class="stage-badge">Stage 1</div>
-        <div class="stage-body"><strong>Heritage Conservation &amp; Restoration DA</strong> — Demolish rear non-original extension (bathroom, laundry, covered patio) and carport; reinstate rear wall of original house; install family bathroom within existing room footprint (Bedroom A, 2.3 × 4m); install temporary galley kitchen in what will ultimately become the ensuite; undertake whole-of-house structural remediation (bearer replacement, pier repair, subfloor remediation); replace all failed windows like-for-like; replace weatherboard cladding; replace roof flashings, fascias, barge boards and gutters; install bullnose window awnings; reinstate front picket fence. <em>Demolition of non-original fabric, reinstatement of the building envelope, and limited internal conversion works.</em></div>
+        <div class="stage-body"><strong>Heritage Conservation &amp; Restoration DA</strong> — Demolish rear non-original extension (bathroom, laundry, covered patio) and carport; reinstate rear wall of original house; install family bathroom within existing room footprint (Bedroom A, 2.3 × 4m); install temporary galley kitchen in what will ultimately become the ensuite; undertake whole-of-house structural remediation (bearer replacement, pier repair, subfloor remediation); replace all windows with dimensionally consistent double-hung sash units with double glazing — bay window configuration reinstated to front two rooms; replace weatherboard cladding; replace roof flashings, fascias, barge boards and gutters; install bullnose window awnings; reinstate Federation ironwork balustrade and original front stairs; address BCA balustrade compliance through ground level build-up or heritage exemption. <em>Demolition of non-original fabric, reinstatement of the building envelope, and limited internal conversion works.</em></div>
       </div>
 
       <div class="stage-row">
@@ -537,13 +526,15 @@ function renderBackground() {
 
     <div class="bg-section">
       <div class="bg-section-title">Heritage Philosophy &amp; Approach</div>
-      <p>Stuart and Amy have approached this project with a conservation-led philosophy from the outset. They engaged a heritage consultant to prepare a Statement of Heritage Impact (Part A — Historical Narrative) prior to purchasing the property, conducted primary source research through NSW Land Registry Services to establish the full ownership chain and Crown Grant details, and attended the pre-DA meeting fully briefed on the heritage significance of the building.</p>
+      <p>Stuart and Amy have approached this project with a conservation-led philosophy from the outset. Prior to exchange, Stuart conducted extensive primary source heritage research — consulting NSW Land Registry Services title records, Trove, parish maps, and District Court records — establishing the full ownership chain from the original Crown Grant (12 January 1907, Frederick Bertie Harrigan, £21) through to the present. The historical narrative for the Statement of Heritage Impact (Part A) has been substantially drafted from this primary source research.</p>
+      <p>A heritage consultant has not yet been formally engaged. Stuart and Amy intend to continue their own research and provide detailed documented findings to a contracted heritage consultant to complete the formal Statement of Heritage Impact — or, subject to BSC's guidance, to prepare the HIS themselves with consultant review. The owners welcome Deborah Wray's guidance on the scope and format BSC expects.</p>
       <p>The guiding principles for all works are:</p>
-      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Retain original fabric wherever possible.</strong> No original fabric will be removed unless it is structurally failed beyond repair. All window replacements will be like-for-like in size, profile, and glazing type.</div></div>
-      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Remove non-original fabric that detracts from heritage significance.</strong> The rear extension and carport are clearly non-original additions that compromise the integrity of the Federation-era form. Their removal is a heritage improvement, not a loss.</div></div>
-      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Reinstate documented original elements where evidence exists.</strong> The original Federation ironwork balustrade and front bay windows are proposed for reinstatement. The ironwork pattern is unusual and will be the subject of a specialist metalwork assessment before specification.</div></div>
-      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>New work is legible as new.</strong> The Stage 2 extension will be clearly distinguishable from the original building fabric — consistent with the Burra Charter approach of making new additions readable without mimicking the original.</div></div>
-      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Early engagement over assumptions.</strong> This tool is part of that philosophy — the owners would rather seek written guidance before commencing any works than assume and proceed.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Retain original fabric wherever possible.</strong> No original fabric will be removed unless structurally failed beyond repair. Window replacements will be dimensionally consistent double-hung sash with double glazing — retaining original opening sizes and profile.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Remove non-original fabric that detracts from significance.</strong> The rear extension and carport are clearly non-original additions that compromise the integrity of the Federation-era form. Their removal is a heritage improvement.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Reinstate documented original elements.</strong> The original Federation ironwork balustrade, front entry stairs, and bay windows to the front two rooms are proposed for reinstatement based on historical evidence. The ironwork pattern is unusual — wrought iron with continuous scrolling forms — and will be the subject of a specialist metalwork assessment before DA lodgement.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Address building code compliance through heritage-appropriate means.</strong> The front verandah fall height (~1.8m) requires BCA-compliant balustrade treatment. The owners seek BSC's guidance on the preferred pathway: ground level build-up to reduce the fall, or a heritage exemption argument for the reinstated original ironwork.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>New work is legible as new.</strong> The Stage 2 extension will be clearly distinguishable from original fabric — consistent with Burra Charter principles.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Early engagement over assumptions.</strong> This tool reflects that principle — the owners seek written guidance before commencing any works.</div></div>
     </div>
 
     <div class="bg-section">
@@ -580,6 +571,16 @@ function renderBackground() {
           <div class="people-org">Moin Morris Schaefer, Bellingen</div>
         </div>
       </div>
+    </div>
+
+    <div class="bg-section" style="background:var(--navy);border-color:var(--navy)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:white;margin-bottom:4px">Ready to begin the assessment?</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.65);line-height:1.6">Once you have reviewed the background information above, please move to the <strong style="color:white">Works Assessment</strong> tab to record your determination on each proposed work item.</div>
+        </div>
+        <button onclick="switchTab('assessment')" style="background:white;color:var(--navy);border:none;border-radius:var(--radius-sm);padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0">Go to Works Assessment →</button>
+      </div>
     </div>`;
 }
 
@@ -604,7 +605,7 @@ function initState() {
   };
 }
 
-const STORAGE_KEY = 'myrtle-assessment-v11';
+const STORAGE_KEY = 'myrtle-assessment-v13';
 
 let S = initState();
 
