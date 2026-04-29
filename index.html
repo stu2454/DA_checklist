@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>38 Myrtle Street — Works Assessment</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1a2e4a;
+    --navy-light: #243d61;
+    --exempt-bg: #0F6E56; --exempt-text: #E1F5EE; --exempt-border: #1a9e7f; --exempt-light: #e8f7f3;
+    --da-bg: #9b2335; --da-text: #fdecea; --da-border: #c9394f; --da-light: #fdecea;
+    --assess-bg: #854F0B; --assess-text: #FAEEDA; --assess-border: #c47b1a; --assess-light: #fef3e2;
+    --na-bg: #4a4a5a; --na-text: #f0f0f4; --na-border: #8a8a9a; --na-light: #f0f0f4;
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface-2: #f9f8f6;
+    --border: #e0dbd3;
+    --border-2: #ccc8c1;
+    --text: #1a1917;
+    --text-2: #5a574f;
+    --text-3: #8a877f;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --radius-pill: 100px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Layout */
+  .page { max-width: 860px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* Header */
+  .header {
+    background: var(--navy);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+  }
+  .header-meta { font-size: 11px; opacity: .5; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .header-sub { font-size: 13px; opacity: .65; line-height: 1.5; }
+
+  /* Progress */
+  .progress-track {
+    height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 1.25rem;
+  }
+  .progress-fill {
+    height: 100%; background: var(--navy); border-radius: 2px; transition: width .3s ease;
+  }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: .75rem 1rem; text-align: center;
+  }
+  .stat-val { font-size: 22px; font-weight: 600; line-height: 1; }
+  .stat-lbl { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+  .stat.s-exempt .stat-val { color: var(--exempt-bg); }
+  .stat.s-da .stat-val { color: var(--da-bg); }
+  .stat.s-assess .stat-val { color: var(--assess-bg); }
+
+  /* Assessor bar */
+  .assessor-bar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .assessor-bar label { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+
+  /* Locked banner */
+  .locked-banner {
+    background: var(--exempt-light); border: 1px solid var(--exempt-border);
+    border-radius: var(--radius); padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;
+  }
+  .locked-banner svg { flex-shrink: 0; color: var(--exempt-bg); }
+  .locked-title { font-size: 13px; font-weight: 600; color: var(--exempt-bg); }
+  .locked-meta { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+  /* Dialog */
+  .dialog {
+    background: var(--surface-2); border: 1px solid var(--border-2);
+    border-radius: var(--radius); padding: 1.25rem;
+    margin-bottom: 1rem; display: none;
+  }
+  .dialog.open { display: block; }
+  .dialog-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .dialog-body { font-size: 13px; color: var(--text-2); margin-bottom: 1rem; line-height: 1.5; }
+  .dialog-actions { display: flex; gap: 8px; }
+  .dialog.danger { background: #fff5f5; border-color: var(--da-border); }
+  .dialog.danger .dialog-title { color: var(--da-bg); }
+
+  /* Category card */
+  .cat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden;
+  }
+  .cat-header {
+    padding: .625rem 1.25rem; background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cat-title { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .cat-badge {
+    font-size: 11px; color: var(--text-3); background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 2px 8px;
+  }
+  .cat-badge.complete { background: var(--exempt-light); color: var(--exempt-bg); border-color: var(--exempt-border); }
+
+  /* Item */
+  .item-wrap { border-bottom: 1px solid var(--border); }
+  .item-wrap:last-child { border-bottom: none; }
+  .item-row { padding: .75rem 1.25rem; display: flex; align-items: flex-start; gap: 12px; }
+  .item-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.5; padding-top: 4px; }
+  .item-controls { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .custom-tag {
+    font-size: 10px; color: #185FA5; background: #E6F1FB;
+    border: 1px solid #B5D4F4; border-radius: 4px;
+    padding: 1px 6px; margin-left: 6px; display: inline-block; vertical-align: middle;
+  }
+
+  /* Status buttons */
+  .stn {
+    font-size: 11px; padding: 4px 10px; border-radius: var(--radius-pill);
+    border: 1px solid; cursor: pointer; font-weight: 500;
+    font-family: inherit; background: transparent; white-space: nowrap;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .stn:disabled { cursor: default; opacity: .55; }
+  .stn-e { border-color: var(--exempt-border); color: var(--exempt-bg); }
+  .stn-e:not(:disabled):hover { background: var(--exempt-light); }
+  .stn-e.on { background: var(--exempt-bg); color: var(--exempt-text); border-color: var(--exempt-bg); }
+  .stn-d { border-color: var(--da-border); color: var(--da-bg); }
+  .stn-d:not(:disabled):hover { background: var(--da-light); }
+  .stn-d.on { background: var(--da-bg); color: var(--da-text); border-color: var(--da-bg); }
+  .stn-a { border-color: var(--assess-border); color: var(--assess-bg); }
+  .stn-a:not(:disabled):hover { background: var(--assess-light); }
+  .stn-a.on { background: var(--assess-bg); color: var(--assess-text); border-color: var(--assess-bg); }
+  .stn-n { border-color: var(--na-border); color: var(--na-bg); }
+  .stn-n:not(:disabled):hover { background: var(--na-light); }
+  .stn-n.on { background: var(--na-bg); color: var(--na-text); border-color: var(--na-bg); }
+
+  /* Icon button */
+  .icon-btn {
+    width: 28px; height: 28px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-3); font-size: 13px; flex-shrink: 0; font-family: inherit;
+    transition: background .1s, border-color .1s;
+  }
+  .icon-btn:hover:not(:disabled) { background: var(--surface-2); border-color: var(--border-2); }
+  .icon-btn:disabled { cursor: default; opacity: .5; }
+  .icon-btn.has-notes { border-color: #378ADD; color: #185FA5; }
+  .icon-btn.del:hover { border-color: var(--da-border); color: var(--da-bg); background: var(--da-light); }
+
+  /* Notes */
+  .notes-area { display: none; padding: 0 1.25rem .875rem; }
+  .notes-area.open { display: block; }
+  .notes-area textarea {
+    width: 100%; font-size: 12px; font-family: inherit; color: var(--text);
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 8px 10px;
+    resize: vertical; min-height: 60px; line-height: 1.5;
+    transition: border-color .1s;
+  }
+  .notes-area textarea:focus { outline: none; border-color: var(--border-2); }
+  .notes-area textarea:disabled { opacity: .65; }
+
+  /* Add section */
+  .add-section { padding: .625rem 1.25rem; border-top: 1px dashed var(--border); }
+  .add-trigger {
+    width: 100%; font-size: 12px; color: var(--text-3);
+    background: transparent; border: 1px dashed var(--border-2);
+    border-radius: var(--radius-sm); padding: 6px 12px;
+    cursor: pointer; text-align: left; font-family: inherit;
+    transition: background .1s, color .1s;
+  }
+  .add-trigger:hover { background: var(--surface-2); color: var(--text-2); }
+  .add-form { display: none; gap: 8px; align-items: center; }
+  .add-form.open { display: flex; }
+  .add-form input {
+    flex: 1; font-size: 13px; padding: 6px 10px; font-family: inherit;
+    border: 1px solid var(--border-2); border-radius: var(--radius-sm);
+    color: var(--text); background: var(--surface);
+  }
+  .add-form input:focus { outline: none; border-color: var(--navy); }
+
+  /* Buttons */
+  .btn {
+    font-size: 13px; font-family: inherit; cursor: pointer;
+    border-radius: var(--radius-sm); padding: 7px 16px;
+    font-weight: 500; border: 1px solid; white-space: nowrap;
+    transition: opacity .1s, background .1s;
+  }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn-navy { background: var(--navy); color: white; border-color: var(--navy); }
+  .btn-navy:not(:disabled):hover { background: var(--navy-light); border-color: var(--navy-light); }
+  .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border-2); }
+  .btn-ghost:hover { background: var(--surface-2); }
+  .btn-danger { background: transparent; color: var(--da-bg); border-color: var(--da-border); }
+  .btn-danger:hover { background: var(--da-light); }
+  .btn-sm { font-size: 12px; padding: 5px 12px; }
+
+  /* Footer */
+  .footer-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);
+  }
+  .footer-right { display: flex; gap: 8px; }
+
+  /* Inputs (general) */
+  input[type="text"] {
+    font-size: 13px; font-family: inherit; color: var(--text);
+    background: var(--surface); border: 1px solid var(--border-2);
+    border-radius: var(--radius-sm); padding: 6px 10px;
+    transition: border-color .1s;
+  }
+  input[type="text"]:focus { outline: none; border-color: var(--navy); }
+
+  /* Print */
+  @media print {
+    body { background: white; }
+    .no-print { display: none !important; }
+    .add-section { display: none !important; }
+    .cat-card { break-inside: avoid; }
+    .item-controls { gap: 4px; }
+    .stn { font-size: 10px; padding: 3px 8px; }
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .item-row { flex-direction: column; gap: 8px; }
+    .item-controls { flex-wrap: wrap; }
+  }
+  /* Tabs */
+  .tab-nav {
+    display: flex; gap: 4px; margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab-btn {
+    font-size: 13px; font-weight: 500; font-family: inherit;
+    padding: .625rem 1.25rem; border: none; background: transparent;
+    color: var(--text-3); cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: color .15s, border-color .15s;
+  }
+  .tab-btn:hover { color: var(--text-2); }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); font-weight: 600; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Background tab */
+  .bg-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem 1.75rem; margin-bottom: 1.25rem;
+  }
+  .bg-section-title {
+    font-size: 13px; font-weight: 600; color: var(--navy);
+    text-transform: uppercase; letter-spacing: .05em;
+    margin-bottom: 1rem; padding-bottom: .625rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .bg-section p {
+    font-size: 13px; color: var(--text-2); line-height: 1.75;
+    margin-bottom: .875rem;
+  }
+  .bg-section p:last-child { margin-bottom: 0; }
+  .bg-section strong { color: var(--text); font-weight: 600; }
+  .bg-section em { color: var(--text-2); font-style: italic; }
+  .bg-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    margin-bottom: .875rem;
+  }
+  .bg-kv {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: .625rem .875rem;
+  }
+  .bg-kv-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; }
+  .bg-kv-val { font-size: 13px; color: var(--text); font-weight: 500; }
+  .stage-row {
+    display: flex; gap: 12px; margin-bottom: .875rem; align-items: flex-start;
+  }
+  .stage-badge {
+    font-size: 11px; font-weight: 600; color: white; background: var(--navy);
+    border-radius: var(--radius-sm); padding: 3px 10px; white-space: nowrap; flex-shrink: 0; margin-top: 1px;
+  }
+  .stage-body { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .stage-body strong { color: var(--text); }
+  .principle-row {
+    display: flex; gap: 10px; align-items: flex-start; margin-bottom: .75rem;
+  }
+  .principle-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--navy);
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .principle-text { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+  .people-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  }
+  .people-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: .75rem .875rem;
+  }
+  .people-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .people-role { font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
+  .people-org { font-size: 12px; color: var(--text-2); }
+
+  @media (max-width: 540px) {
+    .bg-grid { grid-template-columns: 1fr; }
+    .people-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Intro panel */
+  .intro {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem 1.75rem; margin-bottom: 1.5rem;
+  }
+  .intro-title {
+    font-size: 13px; font-weight: 600; color: var(--navy);
+    text-transform: uppercase; letter-spacing: .05em; margin-bottom: .75rem;
+  }
+  .intro p {
+    font-size: 13px; color: var(--text-2); line-height: 1.7; margin-bottom: .875rem;
+  }
+  .intro p:last-child { margin-bottom: 0; }
+  .intro strong { color: var(--text); font-weight: 600; }
+  .intro-divider {
+    border: none; border-top: 1px solid var(--border); margin: 1rem 0;
+  }
+  .instructions-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: .875rem 0;
+  }
+  .instr-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: .75rem .875rem;
+  }
+  .instr-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .instr-label.l-exempt { color: var(--exempt-bg); }
+  .instr-label.l-da { color: var(--da-bg); }
+  .instr-label.l-assess { color: var(--assess-bg); }
+  .instr-desc { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+
+  @media (max-width: 540px) {
+    .instructions-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div id="app-header"></div>
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('background')">Background</button>
+    <button class="tab-btn" onclick="switchTab('assessment')">Works Assessment</button>
+  </div>
+  <div id="tab-background" class="tab-panel active">
+    <div id="bg-content"></div>
+  </div>
+  <div id="tab-assessment" class="tab-panel">
+    <div id="app"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
+const CATS = [
+  { id: 'structural', label: 'Structural & Foundation', items: [
+    'Replace rotted bearer sections — southern wall (urgent, active water damage)',
+    'Whole-of-house bearer replacement and masonry pier repair/replacement (note: masonry construction, not timber piers)',
+    'Fit ant caps to masonry piers currently lacking termite protection',
+    'Clear subfloor vegetation from around piers (obscuring inspection)',
+    'Remove stored items from subfloor area and reinspect concealed areas',
+    'Provide alternative access point to rear subfloor area (crawl space currently too low to inspect)',
+    'General subfloor remediation — repair perimeter bearer timbers with confirmed water damage',
+  ]},
+  { id: 'roof', label: 'Roof', items: [
+    'Clean gutters — blocked with leaf matter throughout (maintenance)',
+    'Replace damaged roofing iron — like-for-like Colorbond (maintenance)',
+    'Replace Colorbond with heritage-appropriate corrugated iron (material change)',
+    'Repair or replace roof flashings (weathered, deterioration evident)',
+    'Replace timber fascias, barge boards and trims — significant fungal decay throughout',
+    'Remove asbestos from eave linings',
+    'Replace gutters and downpipes',
+  ]},
+  { id: 'cladding', label: 'External Walls & Cladding', items: [
+    'Replace individual damaged weatherboards — like-for-like profile (maintenance)',
+    'Replace weatherboards across whole facade — like-for-like profile (scale of works)',
+    'Lower external soil level at rear — currently above bottom of wall cladding (concealed termite entry risk)',
+  ]},
+  { id: 'asbestos', label: 'Asbestos Survey & Remediation', items: [
+    'Commission professional asbestos survey of all proposed demolition areas prior to any works commencing',
+    'Licensed asbestos removal — gable face sheeting, front and rear gables (probable ACM)',
+    'Licensed asbestos removal — rear extension laundry/bathroom ceiling and wall sheeting (probable ACM)',
+    'Licensed asbestos removal — carport wall sheeting (inspector confirmed probable ACM)',
+  ]},
+  { id: 'verandah', label: 'Front Verandah & Deck', items: [
+    'Structural engineer assessment of front verandah deck load capacity (inspector was unable to verify)',
+    'Replace fungal decay-affected verandah decking boards',
+    'Repair or replace structural deck support timbers (fungal decay confirmed by inspection)',
+    'Remove creeper vine from southern end of front verandah',
+    'Repair or replace timber window frames and sashes to verandah-facing rooms',
+  ]},
+  { id: 'windows', label: 'Windows & Doors', items: [
+    'Replace failed windows — like-for-like (same size, single-glazed timber sash)',
+    'Replace windows with new double-glazed timber sash units',
+    'Install bullnose window awnings — all elevations (period-appropriate Federation detail, reinstatement)',
+    'Replace external doors',
+    'Replace cracked glass panes to front entry door (stained glass panels — heritage)',
+  ]},
+  { id: 'demolition', label: 'Rear Extension Demolition', items: [
+    'Demolish rear extension (bathroom, laundry, covered patio)',
+    'Demolish carport (extremely poor condition — fungal decay and deterioration throughout)',
+    'Demolish small storage shed at rear (poor condition)',
+    'Reinstate rear wall of original house post-demolition',
+  ]},
+  { id: 'internal', label: 'Internal Works — Stage 1 Interim', items: [
+    'Convert existing bedroom (2.3 x 4m) to family bathroom — wet area fitout within existing room footprint (no structural wall removal required)',
+    'Install temporary galley kitchen (interim, pending extension DA)',
+    'Install Velux solar-powered skylight — family bathroom (Stage 1)',
+    'Install Velux solar-powered skylight — ensuite bathroom (Stage 2, with extension DA)',
+  ]},
+  { id: 'insulation', label: 'Thermal Performance & Insulation', items: [
+    'Install bulk insulation in ceiling/roof void — vapour-permeable batts (no effect on visible heritage fabric)',
+    'Install subfloor insulation between floor joists — reflective foil or rigid batts (installed during subfloor remediation works)',
+    'Install vapour-permeable wall insulation — mineral wool batts with ventilated cavity maintained behind new cladding (installed during cladding replacement works, not a standalone intervention)',
+  ]},
+  { id: 'pest', label: 'Timber Pest Management', items: [
+    'Engage licensed timber pest specialist — full inspection of all areas including roof void and subfloor',
+    'Implement AS3660-compliant Termite Management Plan',
+    'Install chemical and/or physical termite barrier system to building perimeter',
+    'Remove all timbers in contact with ground around building perimeter',
+  ]},
+  { id: 'site', label: 'Site Works & Drainage', items: [
+    'Install drainage to rear yard — water currently ponding against rear wall of house',
+    'Remove large gum tree (structural safety risk to dwelling)',
+    'Clear overgrown vegetation from all sides of building perimeter (termite inspection zone)',
+    'Clear rear and side yard vegetation (currently obscuring inspection)',
+    'Install swale for stormwater management',
+    'Stormwater connection and associated works',
+    'Replace rusted water tank',
+  ]},
+  { id: 'frontage', label: 'Frontage & Fencing', items: [
+    'Reinstate front picket fence',
+    'Replace deteriorated timber fence to rear lane (significant fungal decay)',
+    'Build up ground level at front to reduce verandah fall height below 1m threshold',
+    'Front landscaping with sympathetic stone materials',
+  ]},
+  { id: 'heritage', label: 'Heritage Reinstatement', items: [
+    'Reinstate original Federation ironwork balustrade (pattern to be confirmed by specialist)',
+    'Reinstate bay windows to front elevation (two front rooms)',
+  ]},
+  { id: 'structures', label: 'New Structures', items: [
+    'Construct new carport with gym/workshop space at rear (off rear lane)',
+    'Construct new general storage shed',
+  ]},
+];
+
+// ─── TAB SWITCHING ───────────────────────────────────────────────────────────
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && name === 'background') || (i === 1 && name === 'assessment'));
+  });
+  document.getElementById('tab-background').classList.toggle('active', name === 'background');
+  document.getElementById('tab-assessment').classList.toggle('active', name === 'assessment');
+}
+
+// ─── BACKGROUND CONTENT ──────────────────────────────────────────────────────
+
+function renderHeader() {
+  document.getElementById('app-header').innerHTML = `
+    <div class="header">
+      <div class="header-meta">Bellingen Shire Council &middot; Heritage Development Assessment</div>
+      <div class="header-title">38 Myrtle Street, Dorrigo — Project Overview &amp; Works Assessment</div>
+      <div class="header-sub">Prepared for Daniel Bennett (Senior Planner) and Deborah Wray (Heritage Consultant) &middot; Following pre-DA meeting 28 April 2026 and initial architect meeting 29 April 2026</div>
+    </div>`;
+}
+
+function renderBackground() {
+  document.getElementById('bg-content').innerHTML = `
+
+    <div class="bg-section">
+      <div class="bg-section-title">The Property</div>
+      <div class="bg-grid">
+        <div class="bg-kv"><div class="bg-kv-label">Address</div><div class="bg-kv-val">38 Myrtle Street, Dorrigo NSW 2453</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Lot / DP</div><div class="bg-kv-val">Lot 101, DP 558838</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Heritage Listing</div><div class="bg-kv-val">Schedule 5, Bellingen LEP 2010 — local heritage item</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Lot Area</div><div class="bg-kv-val">Approximately 1,250 m²</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Building Style</div><div class="bg-kv-val">Federation-era double-gable Queenslander, circa 1907</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Original Owner</div><div class="bg-kv-val">Frederick Bertie Harrigan (carpenter) — Crown Grant 12 January 1907</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Current Owners</div><div class="bg-kv-val">Stuart Smith &amp; Amy Brooks</div></div>
+        <div class="bg-kv"><div class="bg-kv-label">Zoning</div><div class="bg-kv-val">R1 General Residential</div></div>
+      </div>
+      <p>The property is a five-bedroom timber-framed and weatherboard-clad single-storey residence on a full original allotment. The building retains its Federation-era double-gable form and front verandah. It was purchased by Stuart Smith and Amy Brooks in early 2026, who intend to permanently relocate to Dorrigo and undertake a heritage-sensitive renovation and extension.</p>
+    </div>
+
+    <div class="bg-section">
+      <div class="bg-section-title">Building Condition</div>
+      <p>The building was independently inspected on <strong>24 March 2026</strong> by Leon Pennell of Jim's Building Inspections (Coffs Harbour). The inspection rated the overall building condition as <strong>poor</strong> compared to others of similar age and construction, with major and minor defects identified throughout. The risk of undetected defects was rated <strong>high</strong> due to access limitations at the time of inspection.</p>
+      <p>Key findings include: floors out of level by 10–30mm throughout due to foundation movement; multiple damaged and collapsed masonry piers with several no longer load-bearing; water damage to perimeter bearer timbers; failed windows on all elevations; extensive fungal decay to external timber elements including weatherboards, window frames, fascias, barge boards and front verandah decking; heavily blocked gutters; and conditions highly conducive to timber pest activity with no current management plan in place.</p>
+      <p>The rear extension — comprising a bathroom, laundry, and covered patio added at an uncertain later date — is structurally compromised and substantially non-original. The carport is in extremely poor condition with severe fungal decay. Both structures are proposed for demolition. Asbestos-containing material is suspected in the rear extension wall and ceiling linings, the carport wall sheeting, and the gable face sheeting, and is the subject of a required professional survey before any demolition works commence.</p>
+      <p><strong>The urgency of repair works is genuine.</strong> Active water ingress through failed windows and weatherboards is causing ongoing deterioration to a building of acknowledged local heritage significance. The owners are committed to arresting this deterioration as quickly as approvals permit.</p>
+    </div>
+
+    <div class="bg-section">
+      <div class="bg-section-title">Proposed Works — Staged Approach</div>
+      <p>Following discussion with architect Oliver Gee (g2architects) on 29 April 2026, a two-stage development approach has been proposed to allow urgent conservation and repair works to proceed without waiting for the full extension design to be resolved.</p>
+
+      <div class="stage-row">
+        <div class="stage-badge">Stage 1</div>
+        <div class="stage-body"><strong>Heritage Conservation &amp; Restoration DA</strong> — Demolish rear non-original extension (bathroom, laundry, covered patio) and carport; reinstate rear wall of original house; install family bathroom within existing room footprint (Bedroom A, 2.3 × 4m); install temporary galley kitchen in what will ultimately become the ensuite; undertake whole-of-house structural remediation (bearer replacement, pier repair, subfloor remediation); replace all failed windows like-for-like; replace weatherboard cladding; replace roof flashings, fascias, barge boards and gutters; install bullnose window awnings; reinstate front picket fence. <em>Demolition of non-original fabric, reinstatement of the building envelope, and limited internal conversion works.</em></div>
+      </div>
+
+      <div class="stage-row">
+        <div class="stage-badge">Stage 2</div>
+        <div class="stage-body"><strong>New Extension DA</strong> — Construct a new contemporary east-facing extension housing open-plan kitchen/dining/living with full rear glazing, master bedroom suite, ensuite (converting the Stage 1 galley kitchen fitout), walk-in wardrobe, and laundry/bootroom. The extension will be clearly distinguishable from the original heritage fabric while being sympathetic in scale, material and form. <em>Subject to full architectural design development — drawings not yet prepared.</em></div>
+      </div>
+
+      <p>Additionally, a number of works may qualify as <strong>exempt development</strong> and are the subject of this assessment tool — specifically, immediate repair and maintenance works that the owners wish to commence without delay. Daniel Bennett indicated at the pre-DA meeting on 28 April 2026 that certain repairs may be able to proceed as exempt. This tool seeks his written position on each proposed work item to provide a clear, datable record before works commence.</p>
+    </div>
+
+    <div class="bg-section">
+      <div class="bg-section-title">Heritage Philosophy &amp; Approach</div>
+      <p>Stuart and Amy have approached this project with a conservation-led philosophy from the outset. They engaged a heritage consultant to prepare a Statement of Heritage Impact (Part A — Historical Narrative) prior to purchasing the property, conducted primary source research through NSW Land Registry Services to establish the full ownership chain and Crown Grant details, and attended the pre-DA meeting fully briefed on the heritage significance of the building.</p>
+      <p>The guiding principles for all works are:</p>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Retain original fabric wherever possible.</strong> No original fabric will be removed unless it is structurally failed beyond repair. All window replacements will be like-for-like in size, profile, and glazing type.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Remove non-original fabric that detracts from heritage significance.</strong> The rear extension and carport are clearly non-original additions that compromise the integrity of the Federation-era form. Their removal is a heritage improvement, not a loss.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Reinstate documented original elements where evidence exists.</strong> The original Federation ironwork balustrade and front bay windows are proposed for reinstatement. The ironwork pattern is unusual and will be the subject of a specialist metalwork assessment before specification.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>New work is legible as new.</strong> The Stage 2 extension will be clearly distinguishable from the original building fabric — consistent with the Burra Charter approach of making new additions readable without mimicking the original.</div></div>
+      <div class="principle-row"><div class="principle-dot"></div><div class="principle-text"><strong>Early engagement over assumptions.</strong> This tool is part of that philosophy — the owners would rather seek written guidance before commencing any works than assume and proceed.</div></div>
+    </div>
+
+    <div class="bg-section">
+      <div class="bg-section-title">Key Contacts</div>
+      <div class="people-grid">
+        <div class="people-card">
+          <div class="people-name">Stuart Smith</div>
+          <div class="people-role">Owner</div>
+          <div class="people-org">0437 470 256</div>
+        </div>
+        <div class="people-card">
+          <div class="people-name">Amy Brooks</div>
+          <div class="people-role">Owner</div>
+          <div class="people-org">0438 607 175</div>
+        </div>
+        <div class="people-card">
+          <div class="people-name">Oliver Gee</div>
+          <div class="people-role">Architect</div>
+          <div class="people-org">g2architects.com.au</div>
+        </div>
+        <div class="people-card">
+          <div class="people-name">Cornerstone Construction Company PTY LTD</div>
+          <div class="people-role">Builder (primary under consideration)</div>
+          <div class="people-org">Dorrigo region</div>
+        </div>
+        <div class="people-card">
+          <div class="people-name">Leon Pennell</div>
+          <div class="people-role">Building &amp; Pest Inspector</div>
+          <div class="people-org">Jim's Building Inspections — 0422 441 126</div>
+        </div>
+        <div class="people-card">
+          <div class="people-name">Lisa Waddell</div>
+          <div class="people-role">Conveyancer</div>
+          <div class="people-org">Moin Morris Schaefer, Bellingen</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+function mkId() { return Math.random().toString(36).slice(2, 9); }
+
+function initState() {
+  return {
+    cats: CATS.map(c => ({
+      ...c,
+      items: c.items.map(text => ({
+        id: mkId(), text, status: null, notes: '', isCustom: false, notesOpen: false
+      })),
+      addOpen: false,
+    })),
+    locked: false,
+    lockedAt: null,
+    assessorName: '',
+    lockDialogOpen: false,
+    resetDialogOpen: false,
+  };
+}
+
+const STORAGE_KEY = 'myrtle-assessment-v11';
+
+let S = initState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) S = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); } catch(e) {}
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+function esc(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getStats() {
+  const all = S.cats.flatMap(c => c.items);
+  return {
+    total:    all.length,
+    exempt:   all.filter(i => i.status === 'exempt').length,
+    da:       all.filter(i => i.status === 'da').length,
+    assess:   all.filter(i => i.status === 'assess').length,
+    na:       all.filter(i => i.status === 'na').length,
+    assessed: all.filter(i => i.status !== null).length,
+  };
+}
+
+function fmtDate(iso) {
+  return new Date(iso).toLocaleString('en-AU', {
+    day: 'numeric', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+// ─── BUILD HTML ──────────────────────────────────────────────────────────────
+
+function buildItem(item) {
+  const dis = S.locked ? 'disabled' : '';
+  const eOn = item.status === 'exempt' ? 'on' : '';
+  const dOn = item.status === 'da'     ? 'on' : '';
+  const aOn = item.status === 'assess' ? 'on' : '';
+  const nOn = item.status === 'na'     ? 'on' : '';
+  const customTag = item.isCustom ? '<span class="custom-tag">added</span>' : '';
+  const delBtn = item.isCustom && !S.locked
+    ? `<button class="icon-btn del" data-action="del" data-id="${item.id}" title="Remove item">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <line x1="1" y1="1" x2="10" y2="10"/><line x1="10" y1="1" x2="1" y2="10"/>
+        </svg>
+       </button>`
+    : '';
+  const notesCls = item.notes ? 'icon-btn has-notes' : 'icon-btn';
+  const notesArrow = item.notesOpen
+    ? `<svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0z"/></svg>`
+    : `<svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0H10z"/></svg>`;
+
+  return `
+    <div class="item-wrap" data-item-id="${item.id}">
+      <div class="item-row">
+        <div class="item-text">${esc(item.text)}${customTag}</div>
+        <div class="item-controls">
+          <button class="stn stn-e ${eOn}" ${dis} data-action="status" data-id="${item.id}" data-status="exempt">Exempt</button>
+          <button class="stn stn-d ${dOn}" ${dis} data-action="status" data-id="${item.id}" data-status="da">DA required</button>
+          <button class="stn stn-a ${aOn}" ${dis} data-action="status" data-id="${item.id}" data-status="assess">Assess</button>
+          <button class="stn stn-n ${nOn}" ${dis} data-action="status" data-id="${item.id}" data-status="na">N/A</button>
+          <button class="${notesCls}" data-action="notes" data-id="${item.id}" title="Notes">${notesArrow}</button>
+          ${delBtn}
+        </div>
+      </div>
+      <div class="notes-area${item.notesOpen ? ' open' : ''}">
+        <textarea placeholder="Add conditions, qualifications, or caveats..." ${dis}
+          data-action="notestext" data-id="${item.id}">${esc(item.notes)}</textarea>
+      </div>
+    </div>`;
+}
+
+function buildCat(cat) {
+  const catItems = cat.items;
+  const assessed = catItems.filter(i => i.status !== null).length;
+  const complete = assessed === catItems.length && catItems.length > 0;
+  const badgeCls = complete ? 'cat-badge complete' : 'cat-badge';
+
+  const addBlock = S.locked ? '' : `
+    <div class="add-section no-print">
+      ${cat.addOpen
+        ? `<div class="add-form open" id="addform-${cat.id}">
+             <input type="text" id="addinput-${cat.id}" placeholder="Describe the work item..." data-cat="${cat.id}"
+               data-action="addinput" autocomplete="off">
+             <button class="btn btn-sm btn-navy" data-action="addconfirm" data-cat="${cat.id}">Add</button>
+             <button class="btn btn-sm btn-ghost" data-action="addcancel" data-cat="${cat.id}">Cancel</button>
+           </div>`
+        : `<button class="add-trigger" data-action="addopen" data-cat="${cat.id}">+ Add item to this category</button>`
+      }
+    </div>`;
+
+  return `
+    <div class="cat-card" data-cat-id="${cat.id}">
+      <div class="cat-header">
+        <span class="cat-title">${esc(cat.label)}</span>
+        <span class="${badgeCls}">${assessed} / ${catItems.length} assessed</span>
+      </div>
+      ${catItems.map(buildItem).join('')}
+      ${addBlock}
+    </div>`;
+}
+
+function render() {
+  const st = getStats();
+  const pct = st.total > 0 ? Math.round(st.assessed / st.total * 100) : 0;
+
+  const lockSVG = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <rect x="3" y="8" width="12" height="9" rx="2" fill="currentColor" opacity=".9"/>
+    <path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  </svg>`;
+
+  const assessorBlock = S.locked
+    ? `<div class="locked-banner">
+         ${lockSVG}
+         <div>
+           <div class="locked-title">Assessment locked</div>
+           <div class="locked-meta">Assessed by ${esc(S.assessorName)} &middot; ${fmtDate(S.lockedAt)}</div>
+         </div>
+       </div>`
+    : `<div class="assessor-bar no-print">
+         <label for="assessor-input">Assessor name</label>
+         <input type="text" id="assessor-input" value="${esc(S.assessorName)}"
+           placeholder="Daniel Bennett" data-action="assessor" style="flex:1">
+         <button class="btn btn-navy" data-action="showlock"
+           ${st.assessed === 0 ? 'disabled' : ''}>Lock assessment</button>
+         <button class="btn btn-ghost no-print" onclick="window.print()">Print</button>
+       </div>`;
+
+  const lockDialog = S.lockDialogOpen ? `
+    <div class="dialog open no-print">
+      <div class="dialog-title">Lock this assessment?</div>
+      <div class="dialog-body">Once locked, no further changes can be made.
+        ${S.assessorName.trim()
+          ? `This will be attributed to <strong>${esc(S.assessorName)}</strong>.`
+          : `<span style="color:var(--da-bg)">Please enter your name above first.</span>`}
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-navy" data-action="confirmlock"
+          ${!S.assessorName.trim() ? 'disabled' : ''}>Confirm lock</button>
+        <button class="btn btn-ghost" data-action="hidelock">Cancel</button>
+      </div>
+    </div>` : '';
+
+  const resetDialog = S.resetDialogOpen ? `
+    <div class="dialog open danger no-print">
+      <div class="dialog-title">Reset all assessments?</div>
+      <div class="dialog-body">This will clear all status selections and notes, and remove any added items.
+        This action cannot be undone.</div>
+      <div class="dialog-actions">
+        <button class="btn btn-danger" data-action="confirmreset">Yes, reset everything</button>
+        <button class="btn btn-ghost" data-action="hidereset">Cancel</button>
+      </div>
+    </div>` : '';
+
+  const footer = S.locked
+    ? `<div class="footer-row no-print">
+         <div></div>
+         <div class="footer-right">
+           <button class="btn btn-ghost" onclick="window.print()">Print / export</button>
+         </div>
+       </div>`
+    : `<div class="footer-row no-print">
+         <button class="btn btn-danger" data-action="showreset">Reset all</button>
+         <div class="footer-right">
+           <button class="btn btn-ghost" onclick="window.print()">Print / export</button>
+         </div>
+       </div>`;
+
+  document.getElementById('app').innerHTML = `
+    <div class="intro">
+      <div class="intro-title">How to use this assessment tool</div>
+      <p>For each proposed work item below, please select one of the following:</p>
+      <div class="instructions-grid">
+        <div class="instr-card">
+          <div class="instr-label l-exempt">Exempt</div>
+          <div class="instr-desc">The work qualifies as exempt development and may proceed without a Development Application.</div>
+        </div>
+        <div class="instr-card">
+          <div class="instr-label l-da">DA required</div>
+          <div class="instr-desc">A formal Development Application must be lodged and approved before this work commences.</div>
+        </div>
+        <div class="instr-card">
+          <div class="instr-label l-assess">Assess</div>
+          <div class="instr-desc">Further information or a site-specific assessment is needed before a determination can be made.</div>
+        </div>
+        <div class="instr-card">
+          <div class="instr-label" style="color:var(--na-bg)">N/A</div>
+          <div class="instr-desc">This item is not a planning matter — it falls outside BSC's jurisdiction and requires no development consent determination.</div>
+        </div>
+      </div>
+      <p>Use the <strong>notes field</strong> (▾ button on each row) to add conditions, qualifications, or caveats. If a work item has been omitted, use the <strong>+ Add item</strong> button at the bottom of any category. When your assessment is complete, enter your name and click <strong>Lock assessment</strong> to create a timestamped record.</p>
+    </div>
+
+    <div class="progress-track no-print">
+      <div class="progress-fill" style="width:${pct}%"></div>
+    </div>
+
+    <div class="stats no-print">
+      <div class="stat s-exempt">
+        <div class="stat-val">${st.exempt}</div>
+        <div class="stat-lbl">Exempt development</div>
+      </div>
+      <div class="stat s-da">
+        <div class="stat-val">${st.da}</div>
+        <div class="stat-lbl">DA required</div>
+      </div>
+      <div class="stat s-assess">
+        <div class="stat-val">${st.assess}</div>
+        <div class="stat-lbl">Needs assessment</div>
+      </div>
+      <div class="stat" style="border-color:var(--na-border)">
+        <div class="stat-val" style="color:var(--na-bg)">${st.na}</div>
+        <div class="stat-lbl">Not applicable</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">${st.total - st.assessed}</div>
+        <div class="stat-lbl">Unassessed</div>
+      </div>
+    </div>
+
+    ${assessorBlock}
+    ${lockDialog}
+    ${resetDialog}
+    ${S.cats.map(buildCat).join('')}
+    ${footer}`;
+
+  // Focus add input if open
+  const openCat = S.cats.find(c => c.addOpen);
+  if (openCat) {
+    setTimeout(() => {
+      const el = document.getElementById('addinput-' + openCat.id);
+      if (el) el.focus();
+    }, 30);
+  }
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+
+function findItem(id) {
+  for (const cat of S.cats) {
+    const item = cat.items.find(i => i.id === id);
+    if (item) return { cat, item };
+  }
+  return null;
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+  const id = el.dataset.id;
+  const cat = el.dataset.cat;
+
+  if (action === 'status') {
+    if (S.locked) return;
+    const found = findItem(id);
+    if (found) {
+      found.item.status = found.item.status === el.dataset.status ? null : el.dataset.status;
+      saveState(); render();
+    }
+
+  } else if (action === 'notes') {
+    const found = findItem(id);
+    if (found) { found.item.notesOpen = !found.item.notesOpen; render(); }
+
+  } else if (action === 'del') {
+    if (S.locked) return;
+    const found = findItem(id);
+    if (found) {
+      found.cat.items = found.cat.items.filter(i => i.id !== id);
+      saveState(); render();
+    }
+
+  } else if (action === 'addopen') {
+    S.cats.forEach(c => c.addOpen = false);
+    const c = S.cats.find(c => c.id === cat);
+    if (c) c.addOpen = true;
+    render();
+
+  } else if (action === 'addconfirm') {
+    const input = document.getElementById('addinput-' + cat);
+    const text = input ? input.value.trim() : '';
+    if (!text) return;
+    const c = S.cats.find(c => c.id === cat);
+    if (c) {
+      c.items.push({ id: mkId(), text, status: null, notes: '', isCustom: true, notesOpen: false });
+      c.addOpen = false;
+      saveState(); render();
+    }
+
+  } else if (action === 'addcancel') {
+    const c = S.cats.find(c => c.id === cat);
+    if (c) { c.addOpen = false; render(); }
+
+  } else if (action === 'showlock') {
+    S.lockDialogOpen = true; render();
+
+  } else if (action === 'hidelock') {
+    S.lockDialogOpen = false; render();
+
+  } else if (action === 'confirmlock') {
+    if (!S.assessorName.trim()) return;
+    S.locked = true;
+    S.lockedAt = new Date().toISOString();
+    S.lockDialogOpen = false;
+    saveState(); render();
+
+  } else if (action === 'showreset') {
+    S.resetDialogOpen = true; render();
+
+  } else if (action === 'hidereset') {
+    S.resetDialogOpen = false; render();
+
+  } else if (action === 'confirmreset') {
+    S = initState();
+    saveState(); render();
+  }
+});
+
+document.addEventListener('input', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const action = el.dataset.action;
+
+  if (action === 'assessor') {
+    S.assessorName = el.value;
+    saveState();
+    // update lock button disabled state without full re-render
+    const lockBtn = document.querySelector('[data-action="showlock"]');
+    const confirmBtn = document.querySelector('[data-action="confirmlock"]');
+    const st = getStats();
+    if (lockBtn) lockBtn.disabled = st.assessed === 0;
+    if (confirmBtn) confirmBtn.disabled = !el.value.trim();
+
+  } else if (action === 'notestext') {
+    if (S.locked) return;
+    const found = findItem(el.dataset.id);
+    if (found) { found.item.notes = el.value; saveState(); }
+    // update notes button class without full re-render
+    const noteBtn = el.closest('.item-wrap')?.querySelector('[data-action="notes"]');
+    if (noteBtn) noteBtn.className = el.value ? 'icon-btn has-notes' : 'icon-btn';
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const el = e.target.closest('[data-action="addinput"]');
+    if (el) {
+      e.preventDefault();
+      const cat = el.dataset.cat;
+      const text = el.value.trim();
+      if (!text) return;
+      const c = S.cats.find(c => c.id === cat);
+      if (c) {
+        c.items.push({ id: mkId(), text, status: null, notes: '', isCustom: true, notesOpen: false });
+        c.addOpen = false;
+        saveState(); render();
+      }
+    }
+  }
+});
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+
+loadState();
+renderHeader();
+renderBackground();
+render();
+</script>
+</body>
+</html>
